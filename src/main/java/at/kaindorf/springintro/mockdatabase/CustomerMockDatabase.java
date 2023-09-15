@@ -37,7 +37,6 @@ public class CustomerMockDatabase {
       String customersStr = objectMapper.writerWithDefaultPrettyPrinter()
           .writeValueAsString(customers.get(0));
      log.info(customersStr);
-
     } catch (IOException e) {
       log.error("failed loading json-mockdata");
       log.error(e.toString());
