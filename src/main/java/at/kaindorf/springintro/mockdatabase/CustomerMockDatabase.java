@@ -5,12 +5,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Project: Exa_01_SpringIntro_4CHIF
@@ -20,6 +22,7 @@ import java.util.List;
  */
 @Component
 @Slf4j
+@Getter
 public class CustomerMockDatabase {
 
   private List<Customer> customers;
@@ -41,6 +44,28 @@ public class CustomerMockDatabase {
       log.error("failed loading json-mockdata");
       log.error(e.toString());
     }
+  }
+
+  public Optional<Customer> getCustumerById(Long id) {
+    return customers.stream()
+        .filter(customer -> customer.getId().equals(id))
+        .findFirst();
+  }
+
+  public Optional<Customer> addCustomer(Customer customer) {
+    if (customer.getId() == null) {
+      Long maxId = customers.stream()
+          .mapToLong(Customer::getId)
+          .max()
+          .getAsLong() + 1;
+      customer.setId(maxId);
+      customers.add(customer);
+    } else {
+      if (customers.contains(customer)) {
+        return Optional.empty();
+      }
+    }
+    return Optional.ofNullable(customer);
   }
 
 }
