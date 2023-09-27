@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Optional;
 
 /**
@@ -36,7 +38,7 @@ public class CustomerController {
 
   @GetMapping("/{id}")
   public ResponseEntity<Customer> getCustomer(@PathVariable("id") Long customerId) {
-    Optional<Customer> customerOptional = customerMockDatabase.getCustumerById(customerId);
+    Optional<Customer> customerOptional = customerMockDatabase.getCustomerById(customerId);
     return ResponseEntity.of(customerOptional);
     //    if (customerOptional.isPresent()) {
 //      return ResponseEntity.ok(customerOptional.get());
@@ -49,9 +51,21 @@ public class CustomerController {
   public ResponseEntity<Customer> addCustomer(@RequestBody Customer customer) {
     Optional<Customer> customerOptional = customerMockDatabase.addCustomer(customer);
     if (customerOptional.isPresent()) {
-      return ResponseEntity.status(HttpStatus.CREATED).body(customerOptional.get());
+      URI location = ServletUriComponentsBuilder
+          .fromCurrentRequest()
+          .path("/{id}")
+          .buildAndExpand(customerOptional.get().getId())
+          .toUri();
+      return ResponseEntity.created(location).body(customerOptional.get());
+//      return ResponseEntity.status(HttpStatus.CREATED).body(customerOptional.get());
     }
     return ResponseEntity.status((HttpStatus.CONFLICT)).build();
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<Customer> createOrSetCustomer(@PathVariable Long id, @RequestBody Customer customer) {
+    Optional<Customer> customerOptional = customerMockDatabase.createOrSetCustomer(id, customer);
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(customerOptional.get());
   }
 
 }

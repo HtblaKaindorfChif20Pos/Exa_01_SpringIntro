@@ -33,20 +33,21 @@ public class CustomerMockDatabase {
     InputStream jsonCustomerStream = this.getClass().getResourceAsStream("/customers.json");
     ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     try {
-      customers = objectMapper.readValue(jsonCustomerStream, new TypeReference<List<Customer>>() {});
+      customers = objectMapper.readValue(jsonCustomerStream, new TypeReference<List<Customer>>() {
+      });
 //      Customer[] custAsArray = objectMapper.readValue(jsonCustomerStream, Customer[].class);
       log.info("json mockdata successfully loaded");
       log.info(customers.get(0).toString());
       String customersStr = objectMapper.writerWithDefaultPrettyPrinter()
           .writeValueAsString(customers.get(0));
-     log.info(customersStr);
+      log.info(customersStr);
     } catch (IOException e) {
       log.error("failed loading json-mockdata");
       log.error(e.toString());
     }
   }
 
-  public Optional<Customer> getCustumerById(Long id) {
+  public Optional<Customer> getCustomerById(Long id) {
     return customers.stream()
         .filter(customer -> customer.getId().equals(id))
         .findFirst();
@@ -63,9 +64,22 @@ public class CustomerMockDatabase {
     } else {
       if (customers.contains(customer)) {
         return Optional.empty();
+      } else {
+        customers.add(customer);
       }
     }
-    return Optional.ofNullable(customer);
+    return Optional.of(customer);
+  }
+
+  public Optional<Customer> createOrSetCustomer(Long customerId, Customer newCustomer) {
+    Optional<Customer> customerOptional = getCustomerById(customerId);
+    newCustomer.setId(customerId);
+    if (customerOptional.isPresent()) {
+      customers.set(customers.indexOf(customerOptional.get()), newCustomer);
+    } else {
+      customers.add(newCustomer);
+    }
+    return Optional.of(newCustomer);
   }
 
 }

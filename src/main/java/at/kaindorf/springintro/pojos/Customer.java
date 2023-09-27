@@ -30,7 +30,6 @@ public class Customer {
   @JsonAlias("last_name")
   private String lastName;
   private String email;
-  @JsonIgnore
   private String gender;
   @JsonAlias("date_of_birth")
   @JsonFormat(pattern = "MM/dd/yyyy")
