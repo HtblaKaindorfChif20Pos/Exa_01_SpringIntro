@@ -68,4 +68,14 @@ public class CustomerController {
     return ResponseEntity.status(HttpStatus.ACCEPTED).body(customerOptional.get());
   }
 
+  @PatchMapping("/{id}")
+  public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
+    Optional<Customer> customerOptional = customerMockDatabase.updateCustomer(id, customer);
+    if (customerOptional.isPresent()) {
+      return ResponseEntity.status(HttpStatus.ACCEPTED).body(customerOptional.get());
+    } else {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
 }

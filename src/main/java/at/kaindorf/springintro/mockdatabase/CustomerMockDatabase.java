@@ -8,9 +8,11 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,4 +84,22 @@ public class CustomerMockDatabase {
     return Optional.of(newCustomer);
   }
 
+  public Optional<Customer> updateCustomer(Long customerId, Customer updatedCustomer) {
+    Optional<Customer> customerOptional = getCustomerById(customerId);
+    if (customerOptional.isEmpty()) {
+      return Optional.empty();
+    }
+    Customer customerInDB = customerOptional.get();
+    customerInDB.setId(null);
+    Field[] fields = Customer.class.getDeclaredFields();
+    for (Field field : fields) {
+      field.setAccessible(true);
+      Object value = ReflectionUtils.getField(field, updatedCustomer);
+      if (value != null) {
+        ReflectionUtils.setField(field, customerInDB, value);
+      }
+    }
+    return Optional.of(customerInDB);
+  }
 }
+
