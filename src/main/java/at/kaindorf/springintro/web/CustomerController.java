@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -32,8 +34,22 @@ public class CustomerController {
    * @return HTTP-Response with all customers in response body and HTTP-status 200
    */
   @GetMapping("/all")
-  public ResponseEntity<Iterable<Customer>> getAllCustomers() {
-    return ResponseEntity.ok(customerMockDatabase.getCustomers());
+  public ResponseEntity<Iterable<Customer>> getAllCustomers(
+      @RequestParam(name = "pageNo", required = false, defaultValue = "0") Integer pageNo
+  ) {
+    int pageSize = 5;
+    int startIndex = pageNo * pageSize;
+    int endIndex = startIndex + pageSize;
+    List<Customer> customerList = customerMockDatabase.getCustomers();
+
+    customerList.sort(Comparator.comparing(Customer::getLastName)
+        .thenComparing(Customer::getFirstName)
+        .reversed());
+
+    if (endIndex >= customerList.size()) {
+      return ResponseEntity.badRequest().build();
+    }
+    return ResponseEntity.ok(customerList.subList(startIndex,endIndex));
   }
 
   @GetMapping("/{id}")

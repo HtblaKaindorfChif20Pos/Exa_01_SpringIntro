@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -35,15 +32,4 @@ public class Customer {
   @JsonFormat(pattern = "MM/dd/yyyy")
   private LocalDate dateOfBirth;
 
-//  @Override
-//  public boolean equals(Object o) {
-//    if (this == o) return true;
-//    if (!(o instanceof Customer customer)) return false;
-//    return Objects.equals(getId(), customer.getId());
-//  }
-//
-//  @Override
-//  public int hashCode() {
-//    return Objects.hash(getId());
-//  }
 }
